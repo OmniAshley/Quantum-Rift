@@ -64,6 +64,13 @@ class QuantumRiftGame:
         self.gravity = 0.5
         self.jump_strength = -10
 
+        # Attack state
+        self.attack_variation = 1  # 1 or 2
+        self.attack_active = False
+        self.attack_frame_start = 0
+        self.attack_frame_end = 4
+        self.attack_frame_count = 0
+
     def load_animations(self, base_dir):
         for state, (folder, filename, sheet_w, sheet_h, num_frames, frame_w, frame_h) in self.anim_info.items():
             frames = []
@@ -81,15 +88,31 @@ class QuantumRiftGame:
     def run(self):
         # Main game loop
         while self.running:
+            attack_key_pressed = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_k:
+                    attack_key_pressed = True
 
             keys = pygame.key.get_pressed()
             prev_state = self.player_state
 
-            # Movement logic
-            if keys[pygame.K_j]:
+            # Attack logic
+            if attack_key_pressed and not self.attack_active:
+                self.player_state = "attack"
+                self.attack_active = True
+                if self.attack_variation == 1:
+                    self.attack_frame_start = 0
+                    self.attack_frame_end = 4
+                else:
+                    self.attack_frame_start = 4
+                    self.attack_frame_end = 8
+                self.player_frame = self.attack_frame_start
+                self.attack_frame_count = self.attack_frame_start
+
+            # If attack is active, keep playing attack frames
+            if self.attack_active:
                 self.player_state = "attack"
             elif self.is_jumping:
                 self.player_state = "jump"
@@ -118,8 +141,8 @@ class QuantumRiftGame:
                     self.player_y = self.ground_y
                     self.is_jumping = False
 
-            # Reset frame if state changed
-            if self.player_state != prev_state:
+            # Reset frame if state changed (except for attack)
+            if self.player_state != prev_state and self.player_state != "attack":
                 self.player_frame = 0
                 self.player_anim_timer = 0
 
@@ -129,8 +152,21 @@ class QuantumRiftGame:
                 self.player_anim_timer += self.player_anim_speed
                 if self.player_anim_timer >= 1:
                     self.player_anim_timer = 0
-                    self.player_frame = (self.player_frame + 1) % len(frames)
-                self.player_frame = self.player_frame % len(frames)
+                    if self.player_state == "attack" and self.attack_active:
+                        self.player_frame += 1
+                        if self.player_frame >= self.attack_frame_end:
+                            self.attack_active = False
+                            # Alternate attack variation for next time
+                            self.attack_variation = 2 if self.attack_variation == 1 else 1
+                            self.player_state = "idle"
+                            self.player_frame = 0
+                    else:
+                        self.player_frame = (self.player_frame + 1) % len(frames)
+                # Clamp attack frame to correct range
+                if self.player_state == "attack" and self.attack_active:
+                    self.player_frame = max(self.attack_frame_start, min(self.player_frame, self.attack_frame_end - 1))
+                else:
+                    self.player_frame = self.player_frame % len(frames)
                 current_frame = frames[self.player_frame]
             else:
                 current_frame = None
