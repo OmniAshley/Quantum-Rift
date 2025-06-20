@@ -6,7 +6,7 @@
 # Date Created: 01/06/2025
 # Last Updated: 20/06/2025
 # Python Version: 3.10.6
-# Design: Tiled Map Editor, Pygame as Game Engine
+# Design: Tiled (Map Editor), Pygame (as Game Engine)
 #----------------------------------------------------------#
 
 # Importing necessary libraries
@@ -30,7 +30,9 @@ class QuantumRiftGame:
                 if tile:
                     self.screen.blit(tile, (x * tmx_data.tilewidth, y * tmx_data.tileheight))
 
-    def __init__(self, width=800, height=640):
+    def __init__(self, width=800, height=640): 
+        # N.B: The resolution is in sync with the Tiled map aspect ratio (50x40 tiles of 16x16 pixels)
+        """Initialize the game configurations."""
         # Initialize Pygame and game window
         pygame.init()
         self.width = width
@@ -51,6 +53,11 @@ class QuantumRiftGame:
             self.background = None
             print(f"Background image not found at {bg_path}")
 
+        # Load Tiled map
+        self.tmx_data = self.load_tiled_map("intro_map")
+        print("Available layers:", [layer.name for layer in self.tmx_data.layers])
+        self.tiled_layers = ["Tile Layer 1", "Tile Layer 2"]
+
         # Animation info: state: (folder, filename, sheet_w, sheet_h, num_frames, frame_w, frame_h)
         self.anim_info = {
             "idle":   ("idle",   "idle.png",   256, 80,  4,  64, 80),
@@ -62,16 +69,17 @@ class QuantumRiftGame:
         self.animations = {}
         self.load_animations(base_dir)
 
+        # Player position
+        self.player_x = self.width // 2 - 32
+        self.ground_y = self.height - 128
+        self.player_y = self.ground_y
+
+        # Idle state
         self.player_state = "idle"
         self.player_frame = 0
         self.player_anim_timer = 0
         self.player_anim_speed = 0.15  # Adjust for animation speed
         self.player_facing_right = True  # Track direction
-
-        # Player position
-        self.player_x = self.width // 2 - 32
-        self.ground_y = self.height - 128
-        self.player_y = self.ground_y
 
         # Jump physics
         self.is_jumping = False
@@ -88,12 +96,8 @@ class QuantumRiftGame:
         self.attack_frame_end = 4
         self.attack_frame_count = 0
 
-        # Load Tiled map
-        self.tmx_data = self.load_tiled_map("intro_map")
-        print("Available layers:", [layer.name for layer in self.tmx_data.layers])
-        self.tiled_layers = ["Tile Layer 1", "Tile Layer 2"]
-
     def show_main_menu(self):
+        """Display the main menu."""
         font = pygame.font.SysFont("Arial", 48)
         small_font = pygame.font.SysFont("Arial", 28)
         menu_active = True
@@ -119,6 +123,7 @@ class QuantumRiftGame:
             self.clock.tick(60)
 
     def load_animations(self, base_dir):
+        """Load animations from spritesheets."""
         for state, (folder, filename, sheet_w, sheet_h, num_frames, frame_w, frame_h) in self.anim_info.items():
             frames = []
             sheet_path = os.path.join(base_dir, "assets", "characters", folder, filename)
@@ -133,8 +138,8 @@ class QuantumRiftGame:
             self.animations[state] = frames
 
     def run(self):
+        """Main game loop."""
         self.show_main_menu()
-        # Main game loop
         while self.running:
             attack_key_pressed = False
             for event in pygame.event.get():
