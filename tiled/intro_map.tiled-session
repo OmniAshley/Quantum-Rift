@@ -1,0 +1,42 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "intro_map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "intro_map.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 371,
+                "y": 561
+            }
+        },
+        "tiles.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/zetra/OneDrive/Career and Prospects/Python Projects/Quantum-Rift/tiled",
+    "last.imagePath": "C:/Users/zetra/OneDrive/Career and Prospects/Python Projects/Quantum-Rift/assets/platforms",
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "intro_map.tmx",
+        "tiles.tsx"
+    ],
+    "project": "intro_map.tiled-project",
+    "recentFiles": [
+        "tiles.tsx",
+        "intro_map.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
